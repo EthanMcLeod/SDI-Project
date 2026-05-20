@@ -69,7 +69,21 @@
 
                 // Extract the coordinate coordinates array from your GeoJSON line layer
                 // Note: GeoJSON stores positions as [Longitude, Latitude]
-                var routeCoordinates = geojsonData.features[0].geometry.coordinates;
+                var routeCoordinates = []
+                var geometry = geojsonData.features[0].geometry;
+
+                if (geometry.type === 'LineString') {
+                    routeCoordinates = geometry.coordinates;
+                } else if (geometry.type === 'MultiLineString') {
+                    // Combine nested arrays into one continuous array
+                    routeCoordinates = geometry.coordinates.flat(1);
+                }
+
+                if (routeCoordinates.length === 0) {
+                    console.error("No coordinates found in the GeoJSON file.");
+                    return;
+                }
+
                 var currentIndex = 0;
 
                 // Function that updates the marker position to the next coordinate point
@@ -79,7 +93,7 @@
                     var currentPoint = routeCoordinates[currentIndex];
                     
                     // Leaflet requires coordinates in [Latitude, Longitude] format (reversed from GeoJSON)
-                    var latLng = [currentPoint[1], currentPoint[2] || currentPoint[1]]; 
+                    //var latLng = [currentPoint[1], currentPoint[2] || currentPoint[1]]; 
                     var lat = currentPoint[1];
                     var lng = currentPoint[0];
 
