@@ -120,7 +120,9 @@
         /*
             The MyCIti bus
         */
-        //  
+
+        // MyCiti routes info.
+        // Get the routes and add the attributes when clicked.
         fetch('MyCiTi_Bus_Routes.geojson')
             .then(response => response.json())
             .then(geojsonData => {
@@ -172,13 +174,13 @@
                 console.error('Error loading your route GeoJSON file:', error);
             });    
 
-        // Bus routes info
+        
 
-
+        // MyCiti bus stops.
         fetch('MyCiTi_Bus_Stops.geojson') // Make sure this matches your filename
         .then(response => response.json())
         .then(geojsonData => {
-            L.geoJSON(geojsonData, {
+            let stopsLayer = L.geoJSON(geojsonData, {
                 // Convert point coordinates into clean blue circle markers
                 pointToLayer: function (feature, latlng) {
                     return L.circleMarker(latlng, {
@@ -192,11 +194,31 @@
                 },
                 // Binds a popup window to every single bus stop dot
                 onEachFeature: function (feature, layer) {
-                    if (feature.properties && feature.properties.STOP_NAME) {
-                        layer.bindPopup("<b>Bus Stop:</b> " + feature.properties.STOP_NAME);
+
+                    if (feature.properties && Object.keys(feature.properties).length > 0) {
+                        // Extracting the specific attributes you provided
+                        let stopName  = feature.properties.STOP_NAME || "Unknown Stop";
+                        let stopType  = feature.properties.STOP_TYPE || "Unknown Type";
+                        let stopStatus = feature.properties.STOP_STS  || "Unknown Status";
+                        let stopDesc   = feature.properties.STOP_DSCR || "No description available.";
+
+                        // Build a clean HTML layout for the stop popup
+                        let popupContent = "<h3>MyCiTi Bus Stop</h3>" +
+                                        "<p><b>Name:</b> " + stopName + "</p>" +
+                                        "<p><b>Type:</b> " + stopType + "</p>" +
+                                        "<p><b>Status:</b> " + stopStatus + "</p>" +
+                                        "<p><b>Description:</b> " + stopDesc + "</p>";
+
+                        layer.bindPopup(popupContent);
+                    } else {
+                        layer.bindPopup("<b>MyCiTi Bus Stop</b><br><i>No data attributes found.</i>");
                     }
+
                 }
             }).addTo(map);
+
+            stopsLayer.bringToFront();
+
         })
         .catch(error => {
             console.error('Error loading your stops GeoJSON file:', error);
