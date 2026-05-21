@@ -126,12 +126,33 @@
             .then(geojsonData => {
                 // Draw the static route line on the map for visual reference
                 L.geoJSON(geojsonData, {
-                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 }
+                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 },
+
+                    // ADD THIS BLOCK TO ENABLE CLICKS:
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties) {
+                            // Try to catch the standard MyCiTi attribute fields.
+                            // (Change these if your shapefile/GeoJSON field names are different!)
+                            let name = feature.properties.line_name || feature.properties.ROUTE_NAME || "Unknown Route";
+                            let code = feature.properties.route_code || feature.properties.ROUTE_CODE || "";
+                            
+                            let popupContent = "<b>MyCiTi Route:</b> " + name;
+                            if (code) {
+                                popupContent += "<br><b>Code:</b> " + code;
+                            }
+
+                            layer.bindPopup(popupContent);
+                        }
+                    }
+
                 }).addTo(map);
             })
             .catch(error => {
                 console.error('Error loading your route GeoJSON file:', error);
             });    
+
+        // Bus routes info
+
 
         fetch('MyCiTi_Bus_Stops.geojson') // Make sure this matches your filename
         .then(response => response.json())
