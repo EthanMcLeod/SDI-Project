@@ -47,6 +47,9 @@
         // Optional: Ensure the map starts within the bounds
         map.fitBounds(capeTownBounds);
 
+        /*
+            The red bus route and live tracking of the bus.
+        */
         // This is just a command inside your script setting up the PNG image
         var busIcon = L.icon({
             iconUrl: 'red-bus-icon.png', 
@@ -64,7 +67,7 @@
             .then(geojsonData => {
                 // Draw the static route line on the map for visual reference
                 L.geoJSON(geojsonData, {
-                    style: { color: '#ff2700', weight: 5, opacity: 0.5 }
+                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 }
                 }).addTo(map);
 
                 // Extract the coordinate coordinates array from your GeoJSON line layer
@@ -113,6 +116,50 @@
             .catch(error => {
                 console.error('Error loading your route GeoJSON file:', error);
             });
+
+        /*
+            The MyCIti bus
+        */
+        //  
+        fetch('MyCiTi_Bus_Routes.geojson')
+            .then(response => response.json())
+            .then(geojsonData => {
+                // Draw the static route line on the map for visual reference
+                L.geoJSON(geojsonData, {
+                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 }
+                }).addTo(map);
+            })
+            .catch(error => {
+                console.error('Error loading your route GeoJSON file:', error);
+            });    
+
+        fetch('MyCiTi_Bus_Stops.geojson') // Make sure this matches your filename
+        .then(response => response.json())
+        .then(geojsonData => {
+            L.geoJSON(geojsonData, {
+                // Convert point coordinates into clean blue circle markers
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 5,         // Size of the dot
+                        fillColor: '#ffffff', // White center
+                        color: '#0052cc',     // A crisp, clear blue border
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    });
+                },
+                // Binds a popup window to every single bus stop dot
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.STOP_NAME) {
+                        layer.bindPopup("<b>Bus Stop:</b> " + feature.properties.STOP_NAME);
+                    }
+                }
+            }).addTo(map);
+        })
+        .catch(error => {
+            console.error('Error loading your stops GeoJSON file:', error);
+        });
+
     </script>
 </body>
 </html>
