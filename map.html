@@ -125,27 +125,48 @@
             .then(response => response.json())
             .then(geojsonData => {
                 // Draw the static route line on the map for visual reference
-                L.geoJSON(geojsonData, {
-                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 },
+                let routeLayer = L.geoJSON(geojsonData, {
+                    style: { color: '#bd1d00', weight: 5, opacity: 0.5, interactive: true },
+
+                //L.geoJSON(geojsonData, {
+                //    style: { color: '#bd1d00', weight: 5, opacity: 0.5, interactive: true },
 
                     // ADD THIS BLOCK TO ENABLE CLICKS:
                     onEachFeature: function (feature, layer) {
-                        if (feature.properties) {
-                            // Try to catch the standard MyCiTi attribute fields.
-                            // (Change these if your shapefile/GeoJSON field names are different!)
-                            let name = feature.properties.line_name || feature.properties.ROUTE_NAME || "Unknown Route";
-                            let code = feature.properties.route_code || feature.properties.ROUTE_CODE || "";
-                            
-                            let popupContent = "<b>MyCiTi Route:</b> " + name;
-                            if (code) {
-                                popupContent += "<br><b>Code:</b> " + code;
-                            }
+                        
+                        
+                        
+                        if (feature.properties && Object.keys(feature.properties).length > 0) {
+                            // Getting the attributes from QGIS.
+                            let routeName = feature.properties.RT_NAME || "Unknown Route";
+                            let routeStatus = feature.properties.RT_STS || "Unknown Status";
+                            let routeType = feature.properties.RT_TYPE || "Unknown Route Type";
+                            let routeNum = feature.properties.RT_NMBR || "Unknown Route Number";
 
+                            // Build the HTML layout for your popup bubble
+                            let popupContent = "<h3>MyCiTi Bus Route</h3>" +
+                                               "<p><b>Route Name:</b> " + routeName + "</p>" +
+                                               "<p><b>Route Status:</b> " + routeStatus + "</p>" +
+                                               "<p><b>Route Type:</b> " + routeType + "</p>" +
+                                               "<p><b>Route Number:</b> " + routeNum + "</p>";
+
+                            // Bind it to the clicked line
                             layer.bindPopup(popupContent);
+
+                            
+                        } else {
+                            // Fallback case if a line completely lacks attributes
+                            layer.bindPopup("<b>MyCiTi Route Layer Clicked!</b><br><i>No attributes found.</i>");
                         }
-                    }
+                        
+                
+                }
 
                 }).addTo(map);
+
+                // 2. FORCE the routes to the top layer so your mouse clicks can actually hit them
+                routeLayer.bringToFront();
+
             })
             .catch(error => {
                 console.error('Error loading your route GeoJSON file:', error);
