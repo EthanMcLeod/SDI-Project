@@ -153,8 +153,31 @@
                             weight: 3,
                             opacity: 0.6
                         };
+                    },
+
+                    // --- ADDED INTERACTIVE POPUPS FOR THE ROUTE LINES ---
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && Object.keys(feature.properties).length > 0) {
+                            // Safely read properties using fallbacks in case QGIS truncated the names
+                            let routeName   = feature.properties.RT_NAME   || feature.properties.name       || "Unknown Route";
+                            let routeStatus = feature.properties.RT_STS    || feature.properties.status     || "Unknown Status";
+                            let routeType   = feature.properties.RT_TYPE   || feature.properties.type       || "Unknown Route Type";
+                            let routeNum    = feature.properties.RT_NMBR   || feature.properties.ROUTE_NUM  || "Unknown Number";
+
+                            // Build the HTML layout for your popup bubble
+                            let popupContent = "<h3>MyCiTi Bus Route</h3>" +
+                                               "<p><b>Route Number:</b> " + routeNum + "</p>" +
+                                               "<p><b>Route Name:</b> " + routeName + "</p>" +
+                                               "<p><b>Route Type:</b> " + routeType + "</p>" +
+                                               "<p><b>Route Status:</b> " + routeStatus + "</p>";
+
+                            // Bind it to the clicked line
+                            layer.bindPopup(popupContent);
+                        } else {
+                            // Fallback case if a line completely lacks attributes
+                            layer.bindPopup("<b>MyCiTi Route Layer Clicked!</b><br><i>No attributes found.</i>");
+                        }
                     }
-                    
                 }).addTo(map);
 
                 // Loop through every individual route feature in the GeoJSON file
