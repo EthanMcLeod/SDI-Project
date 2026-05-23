@@ -134,7 +134,7 @@
                 // Draw ALL 92 static route lines on the map for visual reference
                 L.geoJSON(geojsonData, {
                     style: function(feature){ 
-                        var routeIdentifier = String(feature.properties.ROUTE_NUM || "");
+                        var routeIdentifier = String(feature.properties.RT_NMBR || "");
 
                         //var routeColour = '#ff7800';
 
@@ -153,7 +153,7 @@
                             '113': '#6a3d9a',
                             '114': '#b15928',
                             '115': '#a6cee3',
-                            '118': '#a111a1',
+                            '118': '#290629',
 
                             // 200s Series
                             '213': '#543005',
@@ -198,7 +198,7 @@
                         };
 
                         // Grab matching color from map, otherwise use default gray
-                        var selectedColour = routeColoursMap[routeIdentifier] || '#ff00ff';
+                        var selectedColour = routeColoursMap[routeIdentifier] || '#E3DB14';
                         
                         return {
                             color: selectedColour,
