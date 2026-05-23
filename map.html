@@ -125,6 +125,29 @@
             The MyCIti bus
         */
 
+        // Layers:
+        // Default is visible.
+        var busRoutesLayer = L.layerGroup().addTo(map); 
+        var liveBusesLayer = L.layerGroup().addTo(map);
+        var busStopsToggleLayer = L.layerGroup().addTo(map);
+
+        
+
+        // Define your option menu content (The checkbox label mapping)
+        var overlayLayers = {
+            "Show MyCiTi Bus Stops": busStopsToggleLayer,
+            "Show MyCiTi Routes": busRoutesLayer,
+            "Show Live Buses": liveBusesLayer
+        };
+
+        // Add the native control/option box to the top right of the map
+        L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
+
+
+
+
+
+
         // MyCiti routes info.
         // Get the routes and add the attributes when clicked.
         var activeBuses = []
@@ -233,7 +256,8 @@
                             layer.bindPopup("<b>MyCiTi Route Layer Clicked!</b><br><i>No attributes found.</i>");
                         }
                     }
-                }).addTo(map);
+                }).addTo(busRoutesLayer);
+                // MODIFIED: Added to the Route Line group instead of directly to map
 
                 // Loop through every individual route feature in the GeoJSON file
                 geojsonData.features.forEach((feature, featureIndex) => {
@@ -261,7 +285,7 @@
                     // Create a unique, dedicated marker for this specific bus route
                     var busMarker = L.marker(startLatLng, { icon: busIcon })
                         .bindPopup("<b>Bus Route:</b> " + routeName + "<br><b>Status:</b> In Transit")
-                        .addTo(map);
+                        .addTo(busRoutesLayer);
 
                     // Push this bus's independent state tracking object into our array
                     activeBuses.push({
@@ -320,7 +344,7 @@
 
         // MyCiti bus stops.
         // Create an empty layer container to hold your bus stops
-        var busStopsToggleLayer = L.layerGroup();
+        /*var busStopsToggleLayer = L.layerGroup();
 
         // OPTIONAL: If you want the bus stops to be ticked/visible by default on page load:
         busStopsToggleLayer.addTo(map);
@@ -331,7 +355,7 @@
         };
 
         // Add the native control/option box to the top right of the map
-        L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
+        L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);*/
 
         fetch('MyCiTi_Bus_Stops.geojson') 
         .then(response => response.json())
