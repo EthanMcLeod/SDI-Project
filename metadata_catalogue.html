@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata - City of Cape Town Geoportal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <header class="bg-[#1e3a8a] text-white py-4 px-8 text-center relative flex flex-col items-center justify-center min-h-[110px]">
+        <img src="coct-logo.png" alt="City of Cape Town Logo" class="absolute top-[10px] left-[10px] h-20 object-contain">
+        <h1 class="text-2xl font-bold tracking-wide mt-2">City of Cape Town Geoportal</h1>
+    </header>
+
+    <div class="bg-[#ccc] py-4 px-8 text-center sticky top-0 z-[1000] shadow-md">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search metadata..." 
+            class="w-[60%] max-w-[500px] py-3 px-4 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+    </div>
+
+    <main class="max-w-[1000px] my-8 mx-auto px-4">
+        
+        <section class="bg-white rounded-lg p-6 mb-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] border border-transparent transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-[#3b82f6] group">
+            
+            <div class="bg-[#1e3a8a] text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 text-xl font-semibold">
+                Dataset Title: Spatial Planning Boundaries
+            </div>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Description:</span> This dataset contains official spatial planning structures, planning districts, and zoning metadata records for administrative management within the municipality.
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Format:</span> GeoJSON / Shapefile
+            </p>
+            
+            <p class="my-2 text-gray-700 flex items-center gap-2">
+                <span class="font-bold">Status:</span> Active 
+                <span class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[6px] border-b-green-6xl inline-block align-middle" title="Active Indicator"></span>
+            </p>
+
+            <code class="bg-[#f1f5f9] block p-2 mt-2 rounded break-all font-mono text-sm text-gray-600">
+                urn:uuid:c2a86a7d-coct-4b61-9c6a-spatial-boundary-metadata-2026
+            </code>
+            
+            <a href="#" class="mt-3 inline-block py-2 px-4 bg-[#1e3a8a] text-white no-underline rounded border-none cursor-pointer font-inherit transition-colors duration-200 hover:bg-[#3b82f6]">
+                Download Metadata (XML)
+            </a>
+            
+        </section>
+
+    </main>
+
+</body>
+</html>
