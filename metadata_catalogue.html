@@ -22,38 +22,128 @@
         >
     </div>
 
-    <main class="max-w-[1000px] my-8 mx-auto px-4">
-        
-        <section class="bg-white rounded-lg p-6 mb-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] border border-transparent transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-[#3b82f6] group">
+    <main class="max-w-[1000px] my-8 mx-auto px-4 dynamic-feed">
+       
+
+        <section id="myciti-transit" class="bg-white rounded-lg p-6 mb-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] border border-transparent transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-[#3b82f6] group">
             
             <div class="bg-[#1e3a8a] text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 text-xl font-semibold">
-                Dataset Title: Spatial Planning Boundaries
+                Dataset Title: MyCiTi Bus Transit Network
             </div>
             
             <p class="my-2 text-gray-700">
-                <span class="font-bold">Description:</span> This dataset contains official spatial planning structures, planning districts, and zoning metadata records for administrative management within the municipality.
+                <span class="font-bold">Title:</span> MyCiTi Bus Transit Network
             </p>
             
             <p class="my-2 text-gray-700">
-                <span class="font-bold">Format:</span> GeoJSON / Shapefile
+                <span class="font-bold">Summary:</span> Routes and operational stops for the MyCiTi Bus Rapid Transit (BRT) system in Cape Town.
             </p>
             
-            <p class="my-2 text-gray-700 flex items-center gap-2">
-                <span class="font-bold">Status:</span> Active 
-                <span class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[6px] border-b-green-6xl inline-block align-middle" title="Active Indicator"></span>
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Keywords:</span> transit, bus, routes, stops, transport, myciti, coct_transport
             </p>
-
-            <code class="bg-[#f1f5f9] block p-2 mt-2 rounded break-all font-mono text-sm text-gray-600">
-                urn:uuid:c2a86a7d-coct-4b61-9c6a-spatial-boundary-metadata-2026
-            </code>
             
-            <a href="#" class="mt-3 inline-block py-2 px-4 bg-[#1e3a8a] text-white no-underline rounded border-none cursor-pointer font-inherit transition-colors duration-200 hover:bg-[#3b82f6]">
-                Download Metadata (XML)
-            </a>
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Abstract:</span> This dataset contains official operational transport features for the City of Cape Town's MyCiTi bus service. It includes spatial line vectors mapping out transit route coverages along with point layers referencing municipal bus stop stations.
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Data Type:</span> Vector Group (Line & Point)
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Language:</span> English
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Location:</span> Cape Town, South Africa
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Publication Date:</span> 23 May 2026
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Last Updated:</span> 23 May 2026
+            </p>    
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">CRS:</span> EPSG:4326
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Source:</span> Custom GeoServer Workspace (GeoPackage Store)
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Credits:</span> CoCT, Spatial Data Infrastructure Project
+            </p>
+            
+            <div id="myciti-map" class="preview-map"></div>
+            
+            <p class="mt-4 mb-2 text-gray-700 font-medium border-t border-gray-100 pt-3">
+                Download the Shapefiles directly below or add the local GeoServer WMS/WFS connection parameters to your GIS Desktop application:
+            </p>
+            
+            <div class="space-y-2 my-3">
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WMS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities" target="_blank" rel="noopener" id="wms-myciti" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities</a>
+                    </code>
+                </p>
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WFS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities" target="_blank" rel="noopener" id="wfs-myciti" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities</a>
+                    </code>
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+                <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=coct_transport:myciti_bus_routes&outputFormat=SHAPE-ZIP" class="inline-block py-2 px-4 bg-[#1e3a8a] text-white text-sm no-underline rounded font-medium transition-colors duration-200 hover:bg-[#3b82f6]" download>
+                    Download Routes Shapefile ZIP
+                </a>
+                <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=coct_transport:myciti_bus_stops&outputFormat=SHAPE-ZIP" class="inline-block py-2 px-4 bg-[#1e3a8a] text-white text-sm no-underline rounded font-medium transition-colors duration-200 hover:bg-[#3b82f6]" download>
+                    Download Stops Shapefile ZIP
+                </a>
+                <button onclick="copyToClipboard('wms-myciti', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WMS URL
+                </button>
+                <button onclick="copyToClipboard('wfs-myciti', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WFS URL
+                </button>
+            </div>
             
         </section>
 
     </main>
+
+    <script>
+        function copyToClipboard(elementId, buttonElement) {
+            var linkText = document.getElementById(elementId).getAttribute('href');
+            
+            navigator.clipboard.writeText(linkText).then(function() {
+                // Save original action title layout text configuration 
+                var originalText = buttonElement.innerText;
+                
+                // Show instant dynamic action feedback to layout user
+                buttonElement.innerText = "Copied! ✓";
+                buttonElement.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                buttonElement.classList.add('bg-green-600', 'hover:bg-green-700');
+                
+                // Restore button visual elements state configuration after brief sequence interval
+                setTimeout(function() {
+                    buttonElement.innerText = originalText;
+                    buttonElement.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    buttonElement.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Could not copy link text configuration parameters to system clipboard: ', err);
+                alert("Failed to copy link structure automatically. Please copy text layout paths manually.");
+            });
+        }
+    </script>
 
 </body>
 </html>
