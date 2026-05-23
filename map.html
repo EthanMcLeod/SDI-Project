@@ -285,7 +285,7 @@
                     // Create a unique, dedicated marker for this specific bus route
                     var busMarker = L.marker(startLatLng, { icon: busIcon })
                         .bindPopup("<b>Bus Route:</b> " + routeName + "<br><b>Status:</b> In Transit")
-                        .addTo(busRoutesLayer);
+                        .addTo(liveBusesLayer);
 
                     // Push this bus's independent state tracking object into our array
                     activeBuses.push({
