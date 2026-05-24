@@ -303,6 +303,11 @@
             console.error('Error loading your stops GeoJSON file:', error);
         });
 
+                stopsLayer.bringToFront();
+            })
+            .catch(error => {
+                console.error('Error loading your stops GeoJSON file:', error);
+            });
     </script>
 </body>
 </html>
