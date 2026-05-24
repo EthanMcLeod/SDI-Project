@@ -92,11 +92,13 @@
         var busRoutesLayer = L.layerGroup().addTo(map); 
         var liveBusesLayer = L.layerGroup().addTo(map);
         var busStopsToggleLayer = L.layerGroup().addTo(map);
+        var taxiRouteLayer = L.layerGroup().addTo(map)
 
         var overlayLayers = {
             "Show MyCiTi Bus Stops": busStopsToggleLayer,
             "Show MyCiTi Routes": busRoutesLayer,
-            "Show Live Buses": liveBusesLayer
+            "Show Live Buses": liveBusesLayer,
+            "Show Taxi Routes": taxiRouteLayer
         };
 
         L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
@@ -293,6 +295,47 @@
         .catch(error => {
             console.error('Error loading your stops GeoJSON file:', error);
         });
+
+        /*
+            Taxi
+        */
+        fetch('Taxi_Routes.geojson')
+        .then(response => response.json())
+        .then(geojsonData => {
+            let taxiLayer = L.geoJSON(geojsonData, {
+                style: {
+                    color: '#000000', 
+                    weight: 3,
+                    opacity: 0.7
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        
+                        // Customize these property names based on your GeoJSON attributes
+                        let origin = feature.properties.ORGN || "Unnamed Origin";
+                        let destination  = feature.properties.DSTN || "Unknown Destination";
+
+                        updateSidebar(
+                            "Taxi Network Asset", 
+                            `🚐 Route Origin: ${origin}`, 
+                            "#fff1f2", "#e11d48", "#9f1239",
+                            {
+                                "Destination": destination,
+                                "Status": "Active"
+                            }
+                        );
+                    });
+                }
+            });
+
+            // Add to the dedicated layer group
+            taxiLayer.addTo(taxiRouteLayer);
+        })
+        .catch(error => {
+            console.error('Error loading Taxi_Routes.geojson:', error);
+        });
+
     </script>
 </body>
 </html>
