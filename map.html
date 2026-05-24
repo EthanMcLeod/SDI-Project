@@ -102,7 +102,6 @@
         L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
 
         // --- HELPER SIDEBAR RENDER FUNCTION ---
-        // Updates the sidebar HTML dynamically when items are selected
         function updateSidebar(type, title, bgColor, borderColor, textColor, fields) {
             let fieldsHTML = '';
             for (const [key, val] of Object.entries(fields)) {
@@ -120,11 +119,9 @@
             `;
         }
 
-
         // --- 4. SINGLE FIXED BUS SIMULATION ---
         var liveBusMarker = L.marker([-33.9249, 18.4241], { icon: busIcon }).addTo(map);
         
-        // Push single bus tracking to sidebar on click
         liveBusMarker.on('click', function(e) {
             L.DomEvent.stopPropagation(e);
             updateSidebar(
@@ -135,7 +132,6 @@
             );
         });
 
-
         // --- 5. FETCH MULTI-ROUTE LINES & 92 BUS TRACKING FLEET ---
         var activeBuses = [];
 
@@ -143,7 +139,6 @@
             .then(response => response.json())
             .then(geojsonData => {
                 
-                // Draw static reference layout layers
                 L.geoJSON(geojsonData, {
                     style: function(feature){ 
                         var routeIdentifier = String(feature.properties.RT_NMBR || "");
@@ -163,10 +158,9 @@
                         return { color: selectedColour, weight: 3, opacity: 0.6 };
                     },
                     
-                    // Route line click interception -> Redirects vector data attributes to Sidebar Panel
                     onEachFeature: function (feature, layer) {
                         layer.on('click', function(e) {
-                            L.DomEvent.stopPropagation(e); // Halts standard leaf popups
+                            L.DomEvent.stopPropagation(e); 
                             
                             let routeName   = feature.properties.RT_NAME   || feature.properties.name       || "Unknown Route";
                             let routeStatus = feature.properties.RT_STS    || feature.properties.status     || "Unknown Status";
@@ -187,7 +181,6 @@
                     }
                 }).addTo(busRoutesLayer);
 
-                // Build animation instances for the 92 routes
                 geojsonData.features.forEach((feature, featureIndex) => {
                     var coordinates = [];
                     if (feature.geometry.type === "LineString") {
@@ -204,7 +197,6 @@
 
                     var busMarker = L.marker(startLatLng, { icon: busIcon }).addTo(liveBusesLayer);
 
-                    // Vehicle asset click interception -> Redirects vehicle tracking properties to Sidebar Panel
                     busMarker.on('click', function(e) {
                         L.DomEvent.stopPropagation(e);
                         updateSidebar(
@@ -272,7 +264,6 @@
                     });
                 },
                 
-                // Bus stop marker click interception -> Redirects stop properties to Sidebar Panel
                 onEachFeature: function (feature, layer) {
                     layer.on('click', function(e) {
                         L.DomEvent.stopPropagation(e);
@@ -302,12 +293,6 @@
         .catch(error => {
             console.error('Error loading your stops GeoJSON file:', error);
         });
-
-                stopsLayer.bringToFront();
-            })
-            .catch(error => {
-                console.error('Error loading your stops GeoJSON file:', error);
-            });
     </script>
 </body>
 </html>
