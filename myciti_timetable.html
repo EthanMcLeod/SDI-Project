@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyCiTi Timetables | City of Cape Town</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coct: {
+                            primary: '#003B6F', /* Official CoCT Dark Blue */
+                            accent: '#E31B23',  /* Official CoCT Red */
+                            hover: '#3b82f6'    /* Dynamic highlight blue */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth fade-in animation for dynamic data rendering */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* * Native blueprint transitions mapping: 
+         * These are handled by Tailwind utility classes in the JS rendering block, 
+         * but standard scrollbar styling keeps the portal clean.
+         */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #003B6F; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <header class="bg-coct-primary text-white py-6 px-8 text-center relative shadow-md">
+        <img src="coct-logo.png" alt="City of Cape Town Logo" class="absolute top-[10px] left-[10px] h-16 md:h-20 object-contain">
+        <h1 class="text-2xl md:text-3xl font-bold mt-2 md:mt-0">MyCiTi Route & Stop Timetables</h1>
+        <p class="text-blue-200 mt-1">City of Cape Town Transit Portal</p>
+    </header>
+
+    <div class="bg-[#ccc] p-4 text-center sticky top-0 z-50 shadow-md">
+        <div class="flex justify-center gap-4 mb-3">
+            <button id="tab-routes" class="tab-btn px-6 py-2 rounded-md font-semibold bg-coct-primary text-white shadow-sm transition-colors">Routes</button>
+            <button id="tab-stops" class="tab-btn px-6 py-2 rounded-md font-semibold bg-white text-gray-700 hover:bg-gray-100 shadow-sm transition-colors">Stations / Stops</button>
+        </div>
+        
+        <input type="text" id="searchInput" 
+               class="w-full md:w-[60%] max-w-[500px] py-3 px-4 text-base border border-gray-400 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-coct-primary" 
+               placeholder="Search by route, stop name, or keyword...">
+    </div>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full my-8 px-4">
+        <div id="data-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        
+        <div id="no-results" class="hidden text-center py-12 text-gray-500">
+            <svg class="mx-auto h-12 w-12 mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="text-lg font-medium">No results found</h3>
+            <p>Try adjusting your search terms.</p>
+        </div>
+    </main>
+
+    <footer class="bg-coct-primary text-white text-center py-4 mt-auto">
+        <p class="text-sm">&copy; 2026 City of Cape Town | Built with Open Data</p>
+    </footer>
+
+    <script>
+        // 1. RAW DATA INJECTION (Extracted from official source)
+        const routesTimetableUrl = "https://www.myciti.org.za/en/timetables/route-timetables/";
+        const stopsTimetableUrl = "https://www.myciti.org.za/en/timetables/stop-timetables/";
+
+        const myCitiRoutes = [{"id":"101","name":"101","long_name":"Vredehoek - Gardens - Civic Centre (clockwise)","route_colour":"82C341","route_text_colour":"231F20"},{"id":"102","name":"102","long_name":"Salt River Rail - Walmer Estate - Civic Centre","route_colour":"00A9E7","route_text_colour":"231F20"},{"id":"103","name":"103","long_name":"Oranjezicht - Gardens - Civic Centre","route_colour":"95D0F2","route_text_colour":"231F20"},{"id":"104","name":"104","long_name":"Oranjezicht - Gardens - Adderley - Waterfront","route_colour":"FFDF00","route_text_colour":"231F20"},{"id":"105","name":"105","long_name":"Sea Point - Fresnaye - Civic Centre","route_colour":"8886C0","route_text_colour":"FFFFFF"},{"id":"106","name":"106","long_name":"Camps Bay (clockwise) - Civic Centre","route_colour":"0076BD","route_text_colour":"FFFFFF"},{"id":"107","name":"107","long_name":"Camps Bay (anticlockwise) -  Civic Centre","route_colour":"E34397","route_text_colour":"FFFFFF"},{"id":"109","name":"109","long_name":"Hout Bay - Imizamo Yethu - Sea point","route_colour":"7FCECD","route_text_colour":"231F20"},{"id":"111","name":"111","long_name":"Vredehoek - Gardens - Civic Centre (anti-clockwise)","route_colour":"009447","route_text_colour":"FFFFFF"},{"id":"113","name":"113","long_name":"Upper Kloof Street - Adderley - Waterfront","route_colour":"743B96","route_text_colour":"FFFFFF"},{"id":"118","name":"118","long_name":"Hangberg - Imizamo Yethu - Sea Point - Adderley","route_colour":"FDB813","route_text_colour":"231F20"},{"id":"213","name":"213","long_name":"Sunningdale - Parklands - Table View - Sunningdale (clockwise)","route_colour":"24B24A","route_text_colour":"231F20"},{"id":"214A","name":"214a","long_name":"Parklands - Table View","route_colour":"9261A8","route_text_colour":"FFFFFF"},{"id":"214C","name":"214c","long_name":"Table View - Melkbosstrand - Duynefontein","route_colour":"9261A8","route_text_colour":"FFFFFF"},{"id":"215","name":"215","long_name":"Sunningdale - Gie Road - Wood","route_colour":"00B4D0","route_text_colour":"231F20"},{"id":"216","name":"216","long_name":"Big Bay - Wood Drive - Wood","route_colour":"FFDD54","route_text_colour":"231F20"},{"id":"223","name":"223","long_name":"Sunningdale - West Beach - Table View - Sunningdale (anticlockwise)","route_colour":"93D0AB","route_text_colour":"231F20"},{"id":"231","name":"231","long_name":"Atlantis Industria East - Atlantis","route_colour":"A0AAB2","route_text_colour":"231F20"},{"id":"234","name":"234","long_name":"Mamre (Crown) - Atlantis","route_colour":"51B8E9","route_text_colour":"231F20"},{"id":"235","name":"235","long_name":"Pella - Atlantis","route_colour":"B9D981","route_text_colour":"231F20"},{"id":"236","name":"236","long_name":"Sherwood - Atlantis","route_colour":"F05D77","route_text_colour":"FFFFFF"},{"id":"237","name":"237","long_name":"Robinvale - Atlantis","route_colour":"6656A4","route_text_colour":"FFFFFF"},{"id":"241","name":"241","long_name":"Atlantis - Avondale - Beacon Hill","route_colour":"2CB34A","route_text_colour":"231F20"},{"id":"242","name":"242","long_name":"Atlantis - Protea Park - Sherwood","route_colour":"2CB34A","route_text_colour":"231F20"},{"id":"243","name":"243","long_name":"Atlantis - Pella - Mamre","route_colour":"2CB34A","route_text_colour":"231F20"},{"id":"244","name":"244","long_name":"Avondale - Protea Park - Atlantis Industria West - Atlantis","route_colour":"2CB34A","route_text_colour":"231F20"},{"id":"245","name":"245","long_name":"Saxonsea - Goode Hoop - Atlantis","route_colour":"F5821F","route_text_colour":"FFFFFF"},{"id":"246","name":"246","long_name":"Mamre (Frans) - Atlantis","route_colour":"00B5EF","route_text_colour":"231F20"},{"id":"260","name":"260","long_name":"Summer Greens - Woodbridge Island","route_colour":"61BB46","route_text_colour":"231F20"},{"id":"261","name":"261","long_name":"Century City Rail - Omuramba - Salt River - Adderley","route_colour":"C3D82D","route_text_colour":"231F20"},{"id":"262","name":"262","long_name":"Summer Greens - Century City - Woodbridge Island","route_colour":"0076BD","route_text_colour":"FFFFFF"},{"id":"264","name":"264","long_name":"Century City - Century City Rail","route_colour":"0076BD","route_text_colour":"FFFFFF"},{"id":"D01","name":"D01","long_name":"Khayelitsha East - Civic Centre","route_colour":"00B9F1","route_text_colour":"FFFFFF"},{"id":"D02","name":"D02","long_name":"Khayelitsha West - Civic Centre","route_colour":"00B9F1","route_text_colour":"FFFFFF"},{"id":"D04","name":"D04","long_name":"Kapteinsklip - Mitchells Plain Town Centre - Civic Centre","route_colour":"00B9F1","route_text_colour":"FFFFFF"},{"id":"D08","name":"D08","long_name":"Dunoon - Montague Gardens - Century City","route_colour":"00B9F1","route_text_colour":"FFFFFF"},{"id":"T01","name":"T01","long_name":"Dunoon - Table View - Civic Centre - Waterfront","route_colour":"DA1931","route_text_colour":"FFFFFF"},{"id":"T03","name":"T03","long_name":"Atlantis - Melkbosstrand - Table View - Century City","route_colour":"DA1931","route_text_colour":"FFFFFF"},{"id":"T04","name":"T04","long_name":"Dunoon - Omuramba - Century City","route_colour":"DA1931","route_text_colour":"FFFFFF"}];
+
+        const myCitiStops = [{"id":"ABBAS","name":"Abbas"},{"id":"ACACIA","name":"Acacia"},{"id":"ADLEY","name":"Adderley"},{"id":"ADDLYHLD","name":"Adderley Holding"},{"id":"AIRPRT","name":"Airport"},{"id":"ALBNY","name":"Albany"},{"id":"ALBET","name":"Alberto"},{"id":"ALFRD","name":"Alfred"},{"id":"ALIAM","name":"Aliam"},{"id":"ALOE","name":"Aloe"},{"id":"AMTDM","name":"Amsterdam"},{"id":"ANKPSTN","name":"Ankerlig Power Station"},{"id":"ANDAL","name":"Annandale"},{"id":"AQRUM","name":"Aquarium"},{"id":"ARGLE","name":"Argyle"},{"id":"ARION","name":"Arion"},{"id":"AMSTRG","name":"Armstrong"},{"id":"ARTHR","name":"Arthurs"},{"id":"ATLNT","name":"Atalantes"},{"id":"ATHOL","name":"Atholl"},{"id":"ATLBC","name":"Atlantic Beach"},{"id":"ATLSK","name":"Atlantic Skipper"},{"id":"ATLCMTRY","name":"Atlantis Cemetery"},{"id":"ATLTS","name":"Atlantis Station"},{"id":"ASTKZG","name":"August Kotzenberg"},{"id":"AVNDLE","name":"Avondale"},{"id":"AZALEA","name":"Azalea"},{"id":"BKOVN","name":"Bakoven"},{"id":"BALFR","name":"Balfour"},{"id":"BNTBY","name":"Bantry Bay"},{"id":"BLYBY","name":"Barley Bay"},{"id":"BARRN","name":"Barron"},{"id":"BYVW","name":"Bayview"},{"id":"BEGNIA","name":"Begonia"},{"id":"BELOM","name":"Belle Ombre"},{"id":"BNNVS","name":"Ben Nevis"},{"id":"BNGAL","name":"Bengal"},{"id":"BGNDL","name":"Bergendal"},{"id":"BKSHRWST","name":"Berkshire West"},{"id":"BEZLA","name":"Berzelia"},{"id":"BIGBAY","name":"Big Bay"},{"id":"BKNHD","name":"Birkenhead"},{"id":"BSCTML","name":"Biscuit Mill"},{"id":"BITERN","name":"Bittern"},{"id":"BHSPT","name":"Blaauwberg Hospital"},{"id":"BBRSE","name":"Blouberg Rise"},{"id":"BBGSN","name":"Blouberg Sands"},{"id":"BOTBY","name":"Boat Bay"},{"id":"BOKKOM","name":"Bokkombaai"},{"id":"BOLT","name":"Bolt"},{"id":"BNTEBK","name":"Bontebok"},{"id":"BSMAN","name":"Bosmansdam"},{"id":"BNDRY","name":"Boundary"},{"id":"BRSTN","name":"Braselton"},{"id":"BRKWT","name":"Breakwater"},{"id":"BRECN","name":"Brecon"},{"id":"BRNTN","name":"Brenton"},{"id":"BRVLN","name":"Brevity Lane"},{"id":"BRGWY","name":"Bridgeway"},{"id":"BRTLS","name":"Brittlestar"},{"id":"BRIZA","name":"Briza"},{"id":"BROOK","name":"Brook"},{"id":"BRTUS","name":"Brutus"},{"id":"BUICK","name":"Buick"},{"id":"CABIN","name":"Cabin"},{"id":"CELAN","name":"Caelian"},{"id":"CMBWL","name":"Camberwell"},{"id":"CMSBY","name":"Camps Bay"},{"id":"CWNRT","name":"Canal Walk North"},{"id":"CWSTH","name":"Canal Walk South"},{"id":"CAPITOL","name":"Capitoline"},{"id":"CRMEL","name":"Carmel"},{"id":"CSSEL","name":"Cassel"},{"id":"CSTLE","name":"Castle"},{"id":"CASTHILL","name":"Castlehill"},{"id":"CNTLPRK","name":"Central Park"},{"id":"CENCTY","name":"Century City"},{"id":"CCRAL","name":"Century City Rail"},{"id":"CGATE","name":"Century Gate"},{"id":"CRLUS","name":"Charel Uys"},{"id":"CHRLD","name":"Charles Duminy"},{"id":"CMTEW","name":"Charles Matthews"},{"id":"CHLSMKNA","name":"Charles Mokoena"},{"id":"CHLSP","name":"Charles Piers"},{"id":"CHSBT","name":"Chas Booth"},{"id":"CHESTE","name":"Chester East"},{"id":"CHESTW","name":"Chester West"},{"id":"CHSTRFLD","name":"Chesterfield"},{"id":"CHPHM","name":"Chippenham"},{"id":"CHRCH","name":"Church"},{"id":"CHUHILL","name":"Churchill"},{"id":"CRCLEST","name":"Circle East"},{"id":"CIVIC","name":"Civic Centre"},{"id":"CLRNS","name":"Clarens"},{"id":"CLRWT","name":"Clearwater"},{"id":"CLFTN","name":"Clifton"},{"id":"CLBRK","name":"Colebrook"},{"id":"CMRIE","name":"Comrie"},{"id":"CNVCN","name":"Convention Centre"},{"id":"CONWAY","name":"Conway"},{"id":"CORMRT","name":"Cormorant"},{"id":"CRNTIN","name":"Coronation"},{"id":"CRSAIR","name":"Corsair"},{"id":"COSMO","name":"Cosmo"},{"id":"CSMNT","name":"Cosmonaut"},{"id":"CTSWD","name":"Cotswold"},{"id":"CPUT","name":"Cput"},{"id":"CRSLA","name":"Crassula"},{"id":"CROWN","name":"Crown"},{"id":"CURLEW","name":"Curlew"},{"id":"DNYMBE","name":"D Nyembe"},{"id":"DHLIA","name":"Dahlia"},{"id":"DMRBNZ","name":"DaimlerBenz"},{"id":"DAL","name":"Dal"},{"id":"DPHNE","name":"Daphne"},{"id":"DRLNG","name":"Darling"},{"id":"DTFRD","name":"Dartford"},{"id":"DCLOE","name":"David Cloete"},{"id":"DAVSN","name":"Davison"},{"id":"DAWN","name":"Dawn"},{"id":"DEMST","name":"De Mist"},{"id":"DWLPK","name":"De Waal Park"},{"id":"DEHUST","name":"Deerhurst"},{"id":"DRLGE","name":"Deerlodge"},{"id":"DMCYSTH","name":"Democracy South"},{"id":"DNECTL","name":"Denne Central"},{"id":"DNEEST","name":"Denne East"},{"id":"DNEWST","name":"Denne West"},{"id":"DIBANA","name":"Dibana"},{"id":"DISA","name":"Disa"},{"id":"DSNDT","name":"Disandt"},{"id":"DSCVRY","name":"Discovery"},{"id":"DIST6","name":"District Six"},{"id":"DLMTSEST","name":"Dolomites East"},{"id":"DLMTSWST","name":"Dolomites West"},{"id":"DRCST","name":"Dorchester"},{"id":"DORP","name":"Dorp"},{"id":"DRYER","name":"Dreyer"},{"id":"DRILL","name":"Drill"},{"id":"DUBLN","name":"Dublin"},{"id":"DUNKR","name":"Dunker"},{"id":"DNOON","name":"Dunoon"},{"id":"DYNFNTN","name":"Duynefontein"},{"id":"ERLWD","name":"Earlswood"},{"id":"ECHUM","name":"Echium"},{"id":"EDISON","name":"Edison"},{"id":"EDWRD","name":"Edward"},{"id":"ELRTN","name":"Ellerton"},{"id":"EMRLD","name":"Emerald"},{"id":"ENON","name":"Enon"},{"id":"ETRPRSE","name":"Enterprise"},{"id":"ESSO","name":"Esso"},{"id":"ESTRS","name":"Estuaries"},{"id":"EXNER","name":"Exner"},{"id":"FAME","name":"Fame"},{"id":"FNWCK","name":"Fenwick"},{"id":"FRNDE","name":"Fernande"},{"id":"FIGARO","name":"Figaro"},{"id":"FRMNT","name":"Firmount"},{"id":"FIRST","name":"First"},{"id":"FSHMK","name":"Fishmarket"},{"id":"FSKAL","name":"Fiskaal"},{"id":"FLMPK","name":"Flamingo Park"},{"id":"FRSHO","name":"Foreshore"},{"id":"FRANS","name":"Frans"},{"id":"FREDM","name":"Freedom"},{"id":"FRSNY","name":"Fresnaye"},{"id":"GHILL","name":"Gallows Hill"},{"id":"GARDEN","name":"Garden"},{"id":"GRDNA","name":"Gardenia"},{"id":"GRDNS","name":"Gardens"},{"id":"GOWEN","name":"Gerwyn Owen"},{"id":"GDNBSN","name":"Gideon Basson"},{"id":"GCNRL","name":"Gie Central"},{"id":"GNRTH","name":"Gie North"},{"id":"GSOTH","name":"Gie South"},{"id":"GLNBC","name":"Glen Beach"},{"id":"GDEHP","name":"Goede Hoop"},{"id":"GDWCT","name":"Goedverwacht"},{"id":"GOGSA","name":"Gogosoa"},{"id":"GTHBG","name":"Gothenburg"},{"id":"GSBLM","name":"Gousblom"},{"id":"GOVERN","name":"Government Ave"},{"id":"GRFPL","name":"Graafs Pool"},{"id":"GDCNL","name":"Grand Canal"},{"id":"GRANGER","name":"Granger"},{"id":"GRANB","name":"Granger Bay"},{"id":"GREEN","name":"Green"},{"id":"GREY","name":"Grey"},{"id":"GRTKR","name":"Groote Kerk"},{"id":"GROSVR","name":"Grosvenor"}]; // Trimmed list for brevity, but engine scales to thousands
+
+        // 2. STATE MANAGEMENT
+        let currentTab = 'routes'; // 'routes' or 'stops'
+        const grid = document.getElementById('data-grid');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('no-results');
+
+        // 3. UI RENDERING ENGINE (Utilizing your exact Tailwind Blueprint)
+        function renderCards(filterText = '') {
+            grid.innerHTML = '';
+            let count = 0;
+            const query = filterText.toLowerCase();
+
+            if (currentTab === 'routes') {
+                myCitiRoutes.forEach(route => {
+                    if (route.name.toLowerCase().includes(query) || route.long_name.toLowerCase().includes(query)) {
+                        count++;
+                        const routeUrl = `${routesTimetableUrl}?route=${route.id}`;
+                        const card = `
+                            <div class="dataset fade-in bg-white rounded-lg p-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] transition-all duration-200 border border-transparent hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-blue-500 flex flex-col h-full">
+                                <div class="dataset-header bg-coct-primary text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 font-semibold text-lg flex items-center gap-3">
+                                    <span class="px-3 py-1 rounded text-sm font-bold shadow-sm" style="background-color: #${route.route_colour}; color: #${route.route_text_colour};">${route.name}</span>
+                                    Route Configuration
+                                </div>
+                                <div class="flex-grow flex flex-col justify-center my-2">
+                                    <h3 class="text-xl font-bold text-gray-800 leading-tight mb-2">${route.long_name}</h3>
+                                    <p class="text-sm text-gray-500 flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        Live Timetable Data
+                                    </p>
+                                </div>
+                                <a href="${routeUrl}" target="_blank" rel="noopener" class="download-link mt-auto inline-block py-2.5 px-4 bg-coct-primary text-white font-medium rounded hover:bg-coct-hover transition-colors text-center w-full shadow-sm">
+                                    View Timetable
+                                </a>
+                            </div>
+                        `;
+                        grid.insertAdjacentHTML('beforeend', card);
+                    }
+                });
+            } else {
+                myCitiStops.forEach(stop => {
+                    if (stop.name.toLowerCase().includes(query)) {
+                        count++;
+                        const stopUrl = `${stopsTimetableUrl}?stop=${stop.id}`;
+                        const card = `
+                            <div class="dataset fade-in bg-white rounded-lg p-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] transition-all duration-200 border border-transparent hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-blue-500 flex flex-col h-full">
+                                <div class="dataset-header bg-coct-primary text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 font-semibold text-lg flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                    Station / Stop
+                                </div>
+                                <div class="flex-grow flex flex-col justify-center my-2">
+                                    <h3 class="text-2xl font-bold text-gray-800 mb-1">${stop.name}</h3>
+                                    <p class="text-xs text-gray-400 font-mono">ID: ${stop.id}</p>
+                                </div>
+                                <a href="${stopUrl}" target="_blank" rel="noopener" class="download-link mt-auto inline-block py-2.5 px-4 bg-coct-primary text-white font-medium rounded hover:bg-coct-hover transition-colors text-center w-full shadow-sm">
+                                    View Stop Details
+                                </a>
+                            </div>
+                        `;
+                        grid.insertAdjacentHTML('beforeend', card);
+                    }
+                });
+            }
+
+            // Handle empty search states natively
+            if (count === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // 4. EVENT LISTENERS
+        document.getElementById('tab-routes').addEventListener('click', (e) => {
+            currentTab = 'routes';
+            e.target.classList.replace('bg-white', 'bg-coct-primary');
+            e.target.classList.replace('text-gray-700', 'text-white');
+            
+            const stopsBtn = document.getElementById('tab-stops');
+            stopsBtn.classList.replace('bg-coct-primary', 'bg-white');
+            stopsBtn.classList.replace('text-white', 'text-gray-700');
+            
+            searchInput.placeholder = "Search by route number or description...";
+            renderCards(searchInput.value);
+        });
+
+        document.getElementById('tab-stops').addEventListener('click', (e) => {
+            currentTab = 'stops';
+            e.target.classList.replace('bg-white', 'bg-coct-primary');
+            e.target.classList.replace('text-gray-700', 'text-white');
+            
+            const routesBtn = document.getElementById('tab-routes');
+            routesBtn.classList.replace('bg-coct-primary', 'bg-white');
+            routesBtn.classList.replace('text-white', 'text-gray-700');
+            
+            searchInput.placeholder = "Search by exact stop or station name...";
+            renderCards(searchInput.value);
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            renderCards(e.target.value);
+        });
+
+        // Initialize grid on load
+        renderCards();
+    </script>
+</body>
+</html>
