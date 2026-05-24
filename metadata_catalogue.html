@@ -190,6 +190,115 @@
             
         </section>
 
+        <section id="taxi-routes" class="bg-white rounded-lg p-6 mb-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] border border-transparent transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-[#3b82f6] group">
+            
+            <div class="bg-[#1e3a8a] text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 text-xl font-semibold">
+                Dataset Title: Minibus Taxi Transit Routes
+            </div>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Title:</span> Minibus Taxi Transit Routes
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Abstract:</span> This layer maps the operational corridors utilized by minibus taxi operators across the metro area.
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">CRS:</span> EPSG:4326
+            </p>
+            
+            <div id="taxi-map" class="h-[300px] w-full mt-4 mb-4 rounded-lg border border-gray-300 relative z-10"></div>
+
+            <p class="mt-4 mb-2 text-gray-700 font-medium border-t border-gray-100 pt-3">
+                Download the Shapefile directly below:
+            </p>
+            
+    
+            <div class="space-y-2 my-3">
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WMS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities" target="_blank" rel="noopener" id="wms-taxi-routes" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities</a>
+                    </code>
+                </p>
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WFS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities" target="_blank" rel="noopener" id="wfs-taxi-routes" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities</a>
+                    </code>
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+                <a href="https://raw.githubusercontent.com/EthanMcLeod/SDI-Project/test/taxi_routes.zip" class="inline-block py-2 px-4 bg-[#1e3a8a] text-white text-sm no-underline rounded font-medium transition-colors duration-200 hover:bg-[#3b82f6]" download>
+                    Download Taxi Routes Shapefile ZIP
+                </a>
+                <button onclick="copyToClipboard('wms-taxi-routes', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WMS URL
+                </button>
+                <button onclick="copyToClipboard('wfs-taxi-routes', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WFS URL
+                </button>
+            </div>
+
+
+            
+        </section>
+
+        <section id="train-network" class="bg-white rounded-lg p-6 mb-6 shadow-[0_2px_6px_rgba(0,0,0,0.1)] border border-transparent transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:border-[#3b82f6] group">
+            
+            <div class="bg-[#1e3a8a] text-white py-3 px-4 rounded-t-md -mx-6 -mt-6 mb-4 text-xl font-semibold">
+                Dataset Title: Passenger Rail Network Infrastructure
+            </div>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Title:</span> Passenger Rail Network Infrastructure
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">Abstract:</span> Spatial vector layer logging the physical passenger train alignments and route tracks operating within the Cape Town municipal bounds.
+            </p>
+            
+            <p class="my-2 text-gray-700">
+                <span class="font-bold">CRS:</span> EPSG:4326
+            </p>
+            
+            <div id="train-map" class="h-[300px] w-full mt-4 mb-4 rounded-lg border border-gray-300 relative z-10"></div>
+
+            <p class="mt-4 mb-2 text-gray-700 font-medium border-t border-gray-100 pt-3">
+                Download the Shapefile directly below:
+            </p>
+            
+            <div class="space-y-2 my-3">
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WMS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities" target="_blank" rel="noopener" id="wms-train-network" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WMS&version=1.1.1&request=GetCapabilities</a>
+                    </code>
+                </p>
+                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span class="font-bold text-gray-700">WFS URL:</span> 
+                    <code class="bg-white px-1 py-0.5 rounded border font-mono text-xs break-all text-blue-700">
+                        <a href="http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities" target="_blank" rel="noopener" id="wfs-train-network" class="hover:underline">http://102.37.138.104:8080/geoserver/coct_transport/ows?service=WFS&acceptversions=2.0.0&request=GetCapabilities</a>
+                    </code>
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+                <a href="https://raw.githubusercontent.com/EthanMcLeod/SDI-Project/test/train_info.zip" class="inline-block py-2 px-4 bg-[#1e3a8a] text-white text-sm no-underline rounded font-medium transition-colors duration-200 hover:bg-[#3b82f6]" download>
+                    Download Train Tracks Shapefile ZIP
+                </a>
+                <button onclick="copyToClipboard('wms-train-network', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WMS URL
+                </button>
+                <button onclick="copyToClipboard('wfs-train-network', this)" class="py-2 px-4 bg-gray-600 text-white text-sm rounded font-medium transition-colors duration-200 hover:bg-gray-700 cursor-pointer border-none">
+                    Copy WFS URL
+                </button>
+            </div>
+            
+        </section>
+
     </main>
 
     <script>
@@ -271,6 +380,54 @@
             }).catch(error => {
                 console.warn('Preview dataset stops GeoJSON not found. Base tiles only.', error);
             });
+
+
+        // 3. Initialize Map for Taxi Routes
+        var taxiMap = L.map('taxi-map', {
+            center: [-33.92, 18.42], 
+            zoom: 10,
+            minZoom: 8,
+            maxZoom: 15,
+            maxBounds: [[-34.5, 17.5], [-33.0, 19.5]] 
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(taxiMap);
+
+        // Fetch Taxi Routes GeoJSON (Assumes you have a taxi_routes.geojson file exported)
+        fetch('Taxi_Routes.geojson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: { color: '#eab308', weight: 3, opacity: 0.8 } // Yellow styling
+                }).addTo(taxiMap);
+            }).catch(error => {
+                console.warn('Preview dataset taxi routes GeoJSON not found. Base tiles only.', error);
+            });
+
+        // 4. Initialize Map for Train Network
+        var trainMap = L.map('train-map', {
+            center: [-33.92, 18.42],
+            zoom: 10,
+            minZoom: 8,
+            maxZoom: 15,
+            maxBounds: [[-34.5, 17.5], [-33.0, 19.5]]
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(trainMap);
+
+        // Fetch Train Network GeoJSON (Assumes you have a train_info.geojson file exported)
+        fetch('train_info.geojson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: { color: '#dc2626', weight: 4, opacity: 0.8 } // Red styling
+                }).addTo(trainMap);
+            }).catch(error => {
+                console.warn('Preview dataset train network GeoJSON not found. Base tiles only.', error);
+            });
+
     </script>
 </body>
 </html>
