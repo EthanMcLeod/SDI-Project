@@ -93,12 +93,14 @@
         var liveBusesLayer = L.layerGroup().addTo(map);
         var busStopsToggleLayer = L.layerGroup().addTo(map);
         var taxiRouteLayer = L.layerGroup().addTo(map)
+        var trainRouteLayer = L.layerGroup().addTo(map)
 
         var overlayLayers = {
             "Show MyCiTi Bus Stops": busStopsToggleLayer,
             "Show MyCiTi Routes": busRoutesLayer,
             "Show Live Buses": liveBusesLayer,
-            "Show Taxi Routes": taxiRouteLayer
+            "Show Taxi Routes": taxiRouteLayer,
+            "Show Train Routes": trainRouteLayer
         };
 
         L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
@@ -304,7 +306,7 @@
         .then(geojsonData => {
             let taxiLayer = L.geoJSON(geojsonData, {
                 style: {
-                    color: '#000000', 
+                    color: '#7A4343', 
                     weight: 3,
                     opacity: 0.7
                 },
@@ -317,7 +319,7 @@
                         let destination  = feature.properties.DSTN || "Unknown Destination";
 
                         updateSidebar(
-                            "Taxi Route", 
+                            "Taxi Route", `Starts at: ${origin}`,
                             "#fff1f2", "#e11d48", "#9f1239",
                             {
                                 "Origin": origin,
@@ -330,9 +332,33 @@
 
             // Add to the dedicated layer group
             taxiLayer.addTo(taxiRouteLayer);
+            taxiLayer.bringToFront();
         })
         .catch(error => {
             console.error('Error loading Taxi_Routes.geojson:', error);
+        });
+
+        /*
+            Trains
+        */
+        fetch('train_info.geojson')
+        .then(response => response.json())
+        .then(geojsonData => {
+            let trainLayer = L.geoJSON(geojsonData, {
+                style: {
+                    color: '#000000', 
+                    weight: 3,
+                    opacity: 0.7,
+                    dashArray: '10, 10'
+                },
+                
+            });
+
+            // Add to the dedicated layer group
+            trainLayer.addTo(trainRouteLayer);
+        })
+        .catch(error => {
+            console.error('Error loading .geojson:', error);
         });
 
     </script>
