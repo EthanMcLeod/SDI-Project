@@ -1,12 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CDNGI Geoportal</title>
+  <!-- Official City of Cape Town Meta Tags -->
+  <title>City of Cape Town Open Data Portal</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="City of Cape Town Open Data Portal - Student Public Transport Simulation Geoportal">
+  <meta name="twitter:title" content="City of Cape Town Open Data Portal">
+  <meta property="og:title" content="City of Cape Town Open Data Portal">
+  <meta name="twitter:description" content="City of Cape Town Open Data Portal">
+  <meta property="og:description" content="City of Cape Town Open Data Portal">
+  <meta name="twitter:image" content="http://resource.capetown.gov.za/Style%20Library/Images/coct-logo.png">
+  <meta property="og:image" content="http://resource.capetown.gov.za/Style%20Library/Images/coct-logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta property="og:url" content="https://odp-cctegis.opendata.arcgis.com/">
+  <meta property="og:type" content="website">
+  <meta name="google-site-verification" content="V9SzvB895BKr2ff7JVvaJQM1CIgPqOL5FPooX1aqENo">
+  <meta name="msvalidate.01" content="217F0EED65C5B131219477CE2CEAAF8E">
+
+  <!-- Core Styling Frameworks -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  
+  <!-- Official Font Family Integration -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+
   <style>
-    html { scroll-behavior: smooth; }
+    html { 
+      scroll-behavior: smooth; 
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Brand Color Theme Overrides */
+    .bg-coct-blue { background-color: #003B6F; }
+    .text-coct-blue { color: #003B6F; }
+    .border-coct-blue { border-color: #003B6F; }
+    .bg-coct-accent { background-color: #E05206; }
+    .hover-bg-coct-darkblue:hover { background-color: #00274C; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -16,118 +45,131 @@
     .fade-in {
       animation: fadeIn 2s ease-out forwards;
     }
-
-    .dropdown-menu {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.3s ease 0.2s, visibility 0.3s ease 0.2s;
-      min-width: 220px;
-      white-space: nowrap;
-    }
-
-    .dropdown:hover .dropdown-menu,
-    .dropdown:focus-within .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-      transition-delay: 0s;
-    }
   </style>
+
+  <!-- Official Browser Compatibility Guard -->
+  <script>
+    (function() {
+      function isIE() {
+        return (
+          (navigator.appName === 'Microsoft Internet Explorer') ||
+          ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) != null))
+        );
+      }
+      function isEdge() {
+        return navigator.userAgent.toLowerCase().includes('edge');
+      }
+      if (isIE() || isEdge()) {
+        window.location.replace('./unsupported.html');
+      }
+    })();
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 text-gray-900 tracking-wide">
 
-<header class="bg-white shadow fixed w-full z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-    <a href="index.html" class="text-xl font-bold text-blue-700 z-10">
-      CITY OF CAPE TOWN GEOPORTAL
-    </a>
-
-    <nav class="absolute left-1/2 transform -translate-x-1/2 space-x-6 flex items-center z-20">
-      <div class="relative dropdown">
-        <button class="text-gray-600 hover:text-blue-600 font-medium focus:outline-none">
-          About
-        </button>
-        <div class="dropdown-menu absolute bg-white shadow-lg rounded mt-2 z-50">
-          <a href="about-project.html" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:bg-blue-100 p-2 block">About CDNGI Project</a>
-          <a href="project-creation-process.html" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:bg-blue-100 p-2 block">Project Creation Process</a>
-          <a href="what-we-do.html" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:bg-blue-100 p-2 block">What We Provide</a>
-        </div>
-      </div>
-
-      <div class="relative dropdown">
-        <button class="text-gray-600 hover:text-blue-600 font-medium focus:outline-none">
-          Data
-        </button>
-        <div class="dropdown-menu absolute bg-white shadow-lg rounded mt-2 z-50">
-          <a href="geodetic-control-data.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Geodetic and Control Data</a>
-          <a href="elevation-data.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Elevation Data</a>
-          <a href="aerial-imagery.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Aerial Imagery</a>
-          <a href="topological-maps.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Topographic Data</a>
-          <a href="landcover-maps.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Landcover Maps</a>
-          <a href="cadastral-data.html" target="_blank" class="text-gray-700 hover:bg-blue-100 p-2 block">Cadastral Data</a>
-        </div>
-      </div>
-
-      <a href="metadata.html" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-blue-600 font-medium">
-        Metadata Catalogue
+  <!-- Header Banner with Top-Left Official Logo (Navigation Items Removed) -->
+  <header class="bg-white border-b-4 border-coct-blue shadow-sm fixed w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <!-- Top-Left Logo Integration -->
+      <a href="index.html" class="flex items-center z-10">
+        <img src="coct-logo.png" alt="City of Cape Town Logo" class="h-12 w-auto object-contain" />
       </a>
+    </div>
+  </header>
 
-      <div class="relative dropdown">
-        <button class="text-gray-600 hover:text-blue-600 font-medium focus:outline-none">
-          Interactive Map
-        </button>
-        <div class="dropdown-menu absolute bg-white shadow-lg rounded mt-2 z-50">
-          <a href="how-to-use-map.html" class="text-gray-700 hover:bg-blue-100 p-2 block">How to Use the Interactive Map</a>
-          <a href="map.html" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:bg-blue-100 p-2 block">Launch Interactive Map</a>
-        </div>
-      </div>
-    </nav>
-  </div>
-</header>
-
-  <section class="relative h-screen w-full overflow-hidden pt-20">
-    <img src="https://raw.githubusercontent.com/emilywood-uct/cdngi-geoportal/main/Logo.png"
-       alt="CDNGI Logo"
-       class="absolute top-17 right-4 h-20 w-35 z-20" />
-    <div class="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
+  <!-- Hero Landing Section utilizing cape-town.jpg background asset -->
+  <section class="relative h-screen w-full overflow-hidden pt-16 flex flex-col items-center justify-center">
     
-    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 fade-in">
-      <h2 class="text-4xl md:text-5xl font-extrabold mb-4 text-white">CITY OF CAPE TOWN GEOPORTAL</h2>
-      <p class="text-lg md:text-xl max-w-2xl text-white">
+    <!-- Hero Image Integration Background Asset -->
+    <img src="cape-town.jpg" alt="Cape Town Background" class="absolute inset-0 h-full w-full object-cover z-0" />
+    
+    <!-- Image Contrast Overlay Blend -->
+    <div class="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
+    
+    <!-- Action buttons centered cleanly on a solid presentation field -->
+    <div class="relative z-20 text-center px-4 fade-in">
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-4 text-white">Welcome to the City of Cape Town Public Transport Geoportal</h2>
+      <p class="text-lg md:text-xl max-w-2xl mx-auto mb-6 text-white">
+        A geoportal to provide information on taxi routes, train routes and live tracking of the MyCiTi buses.
       </p>
-      
-      <div class="mt-6 flex flex-wrap justify-center gap-4">
-          <a href="map.html" class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-bold shadow-lg">
-            Bus Location
-          </a>
-          <a href="map.html" target="_blank" class="px-6 py-3 bg-gray-200 text-gray-800 rounded hover:bg-blue-700 hover:text-white transition font-bold">
-            Launch Interactive Map
-          </a>
-          <a href="metadata.html" target="_blank" class="px-6 py-3 bg-gray-200 text-gray-800 rounded hover:bg-blue-700 hover:text-white transition font-bold">
-            Explore Metadata
-          </a>
-      </div>
+
+        <div class="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
+            <a href="map.html" target="_blank" class="px-8 py-3.5 bg-coct-blue text-white rounded font-bold uppercase text-sm tracking-wider shadow-lg hover-bg-coct-darkblue transition duration-200 border border-transparent">
+              Interactive Map
+            </a>
+          
+            <a href="metadata_catalogue.html" target="_blank" class="px-8 py-3.5 bg-gray-800 text-white rounded font-bold uppercase text-sm tracking-wider shadow-lg hover:bg-gray-700 transition duration-200 border border-gray-600">
+              Explore Metadata
+            </a>
+        </div>
     </div>
 
-    <div class="absolute bottom-0 w-full bg-black bg-opacity-70 py-4 px-6 text-center text-sm md:text-base text-white z-20">
-      <strong>Disclaimer:</strong> This is not the official City of Cape Town Public Transport Geoportal. It has been created by UCT students doing a third year course, APG3039B.
+    <!-- Mandatory Institutional Disclaimer Footer Segment -->
+    <div class="absolute bottom-0 w-full bg-yellow-600 bg-opacity-95 py-3 px-6 text-center text-xs md:text-sm text-white font-medium z-20 tracking-wide border-t border-yellow-500">
+      <span class="bg-black text-white text-xxs font-black px-1.5 py-0.5 rounded mr-2 uppercase">Disclaimer</span> This is not the official City of Cape Town Public Transport Geoportal. It has been created by UCT students doing a third year course, APG3039B.
     </div>
   </section>
 
-  <section class="bg-blue-100 py-16 px-6">
+  <!-- MyCiTi-->
+  <section class="bg-gray-50 py-20 px-6 border-b border-gray-200">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+      
+      <div class="md:w-1/2">
+        <h3 class="text-3xl font-extrabold mb-4 text-coct-blue uppercase tracking-wide">The MyCiTi Bus</h3>
+        <div class="w-12 h-1 bg-coct-accent mb-6"></div>
+        <p class="text-gray-600 text-lg leading-relaxed mb-8">
+          The MyCiTi bus service is the City of Cape Town's reliable, safe and integrated rapid transit system. Designed to connect communities across the metropolitan area, the network features dedicated bus lanes, feeder routes, and universally accessible stations. Explore our interactive schedules to plan your journey across the city.
+        </p>
+        <a href="myciti_timetable.html" target="_blank" class="inline-block px-8 py-3.5 bg-coct-accent text-white rounded font-bold uppercase text-sm tracking-wider shadow-lg hover:bg-orange-700 transition duration-200 border border-transparent">
+          View Timetable
+        </a>
+      </div>
+
+      <div class="md:w-1/2 w-full">
+        <img src="myciti-bus.jpg" alt="MyCiTi Bus in Cape Town" class="rounded-xl shadow-xl w-full h-auto object-cover border-4 border-white transition transform hover:-translate-y-1 hover:shadow-2xl duration-300" />
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Taxi -->
+   <section class="bg-white py-20 px-6 border-b border-gray-200">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row-reverse items-center gap-12">
+      
+      <div class="md:w-1/2">
+        <h3 class="text-3xl font-extrabold mb-4 text-coct-blue uppercase tracking-wide">The Minibus Taxi Network</h3>
+        <div class="w-12 h-1 bg-coct-accent mb-6"></div>
+        <p class="text-gray-600 text-lg leading-relaxed mb-8">
+          Minibus taxis are a vital component of Cape Town’s public transport, providing essential mobility to commuters throughout the city and surrounding townships. This Geoportal shows key taxi routes to help improve transparency and planning across the metropolitan transport network.
+        </p>
+      </div>
+
+      <div class="md:w-1/2 w-full">
+        <img src="taxi.png" alt="Minibus Taxi in Cape Town" class="rounded-xl shadow-xl w-full h-auto object-cover border-4 border-white transition transform hover:-translate-y-1 hover:shadow-2xl duration-300" />
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Section: Informational Content Profile -->
+  <section class="bg-white py-20 px-6 border-b border-gray-200">
     <div class="max-w-4xl mx-auto text-center">
-      <h3 class="text-2xl font-bold mb-4 text-blue-800">About This Geoportal</h3>
-      <p class="text-gray-700 text-base leading-relaxed">
+      <h3 class="text-2xl font-extrabold mb-4 text-coct-blue uppercase tracking-wide">About This Geoportal</h3>
+      <div class="w-12 h-1 bg-coct-accent mx-auto mb-6"></div>
+      <p class="text-gray-600 text-base leading-relaxed max-w-3xl mx-auto">
         This Geoportal was developed as part of a UCT course, APG3039B. Its purpose is to share the location and updates of public transport. The data may not be accurate, because some of it may have been simulated.
       </p>
     </div>
   </section>
 
-  <footer class="bg-blue-900 text-white py-6">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-sm">
-      <p>© 2026 City of Cape Town Public Transport Geoportal</p>
-      <p>Developed by Ethan McLeod and Renard Conradie</p>
+  <!-- Official Footer Layout Matrix -->
+  <footer class="bg-coct-blue text-white py-10 border-t-8 border-coct-accent">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-xs md:text-sm gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-3 h-3 bg-white transform rotate-45"></div>
+        <p class="font-bold tracking-wider uppercase">© 2026 City of Cape Town Public Transport Geoportal</p>
+      </div>
+      <p class="text-gray-300 font-medium">Developed by Ethan McLeod and Renard Conradie <span class="text-coct-accent font-bold mx-1">|</span> APG3039B UCT</p>
     </div>
   </footer>
 

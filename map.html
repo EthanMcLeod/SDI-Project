@@ -8,23 +8,61 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        /* Full-screen map setup */
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; }
-        #map { height: 100vh; width: 100%; }
+        /* Split-screen layout setup using Flexbox */
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: sans-serif; }
+        
+        .main-container { display: flex; height: 100vh; width: 100vw; }
+        
+        /* Left Sidebar Panel Styles */
+        #sidebar { 
+            width: 350px; 
+            background: #ffffff; 
+            box-shadow: 3px 0 15px rgba(0,0,0,0.15); 
+            z-index: 1000; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
+        
+        /* Right Map Container Styles */
+        #map { flex: 1; height: 100%; }
+        
+        /* Sidebar layout details */
+        .panel-heading { margin-top: 0; color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-size: 1.5rem; }
+        #sidebar-content { color: #4b5563; line-height: 1.6; margin-top: 15px; font-size: 0.95rem; }
+        .placeholder-text { font-style: italic; color: #9ca3af; text-align: center; margin-top: 40px; }
+        
+        /* Feature card tags within sidebar */
+        .badge-card { padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+        .badge-title { font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; display: block; }
+        .badge-header { margin: 4px 0 0 0; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div id="map"></div>
+    <div class="main-container">
+        
+        <div id="sidebar">
+            <h2 class="panel-heading">🗂️ Geoportal Inspector</h2>
+            <div id="sidebar-content">
+                <p class="placeholder-text">Click on any bus route line, blue bus stop dot, or moving bus vehicle on the map canvas to display real-time spatial properties here.</p>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-realtime/2.2.0/leaflet-realtime.min.js"></script>
 
     <script>
-        // 1. Define the boundary for Cape Town (Southwest and Northeast corners)
+        // 1. Define the boundary for Cape Town
         var capeTownBounds = L.latLngBounds(
-            L.latLng(-34.36, 18.25), // Southern tip (Cape Point area)
-            L.latLng(-33.45, 19.00)  // Northern/Eastern edge
+            L.latLng(-34.36, 18.25), 
+            L.latLng(-33.45, 19.00)  
         );
 
         // 2. Initialize the map with constraints
@@ -44,132 +82,259 @@
 
         map.fitBounds(capeTownBounds);
 
-        // Setup the live moving bus asset
+        // --- GLOBAL BUS ICON DEFINITION ---
         var busIcon = L.icon({
             iconUrl: 'red-bus-icon.png', 
             iconSize: [16, 16]
         });
 
-        var liveBusMarker = L.marker([-33.9249, 18.4241], { icon: busIcon })
-            .bindPopup("<b>Live Bus</b><br>Status: In Transit")
-            .addTo(map);
+        // --- LAYER GROUPS INITIALIZATION ---
+        var busRoutesLayer = L.layerGroup().addTo(map); 
+        var liveBusesLayer = L.layerGroup().addTo(map);
+        var busStopsToggleLayer = L.layerGroup().addTo(map);
+        var taxiRouteLayer = L.layerGroup().addTo(map)
 
-        // 4. Fetch Simulated Route Movement
-        fetch('bus_route.geojson')
-            .then(response => response.json())
-            .then(geojsonData => {
-                L.geoJSON(geojsonData, {
-                    style: { color: '#bd1d00', weight: 5, opacity: 0.5 }
-                }).addTo(map);
+        var overlayLayers = {
+            "Show MyCiTi Bus Stops": busStopsToggleLayer,
+            "Show MyCiTi Routes": busRoutesLayer,
+            "Show Live Buses": liveBusesLayer,
+            "Show Taxi Routes": taxiRouteLayer
+        };
 
-                var routeCoordinates = [];
-                var geometry = geojsonData.features[0].geometry;
+        L.control.layers(null, overlayLayers, { collapsed: false }).addTo(map);
 
-                if (geometry.type === 'LineString') {
-                    routeCoordinates = geometry.coordinates;
-                } else if (geometry.type === 'MultiLineString') {
-                    routeCoordinates = geometry.coordinates.flat(1);
-                }
+        // --- HELPER SIDEBAR RENDER FUNCTION ---
+        function updateSidebar(type, title, bgColor, borderColor, textColor, fields) {
+            let fieldsHTML = '';
+            for (const [key, val] of Object.entries(fields)) {
+                fieldsHTML += `<p style="margin: 8px 0;"><strong style="color:#1f2937;">${key}:</strong> ${val}</p>`;
+            }
+            
+            document.getElementById('sidebar-content').innerHTML = `
+                <div class="badge-card" style="background-color: ${bgColor}; border-left: 4px solid ${borderColor};">
+                    <span class="badge-title" style="color: ${textColor};">${type}</span>
+                    <h3 class="badge-header" style="color: ${textColor};">${title}</h3>
+                </div>
+                <div style="padding: 5px;">
+                    ${fieldsHTML}
+                </div>
+            `;
+        }
 
-                if (routeCoordinates.length === 0) {
-                    console.error("No coordinates found in the GeoJSON file.");
-                    return;
-                }
+        // --- 4. SINGLE FIXED BUS SIMULATION ---
+        var liveBusMarker = L.marker([-33.9249, 18.4241], { icon: busIcon }).addTo(map);
+        
+        liveBusMarker.on('click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            updateSidebar(
+                "Primary Simulator Tracking", 
+                "🚩 Core Test Fleet Bus", 
+                "#fff7ed", "#f97316", "#c2410c", 
+                { "Status": "Active - Live Simulation Loop", "Current Vector Velocity": "Scheduled Interval Mode" }
+            );
+        });
 
-                var currentIndex = 0;
+        // --- 5. FETCH MULTI-ROUTE LINES & 92 BUS TRACKING FLEET ---
+        var activeBuses = [];
 
-                function moveBus() {
-                    if (routeCoordinates.length === 0) return;
-
-                    var currentPoint = routeCoordinates[currentIndex];
-                    var lat = currentPoint[1];
-                    var lng = currentPoint[0];
-
-                    liveBusMarker.setLatLng([lat, lng]);
-                    currentIndex = (currentIndex + 1) % routeCoordinates.length;
-                }
-
-                moveBus();
-                setInterval(moveBus, 3000);
-            })
-            .catch(error => {
-                console.error('Error loading your route GeoJSON file:', error);
-            });
-
-        // 5. Fetch MyCiTi Bus Routes Layer
         fetch('MyCiTi_Bus_Routes.geojson')
             .then(response => response.json())
             .then(geojsonData => {
-                // FIXED: Explicitly defined routeLayer variable
-                let routeLayer = L.geoJSON(geojsonData, {
-                    style: { color: '#bd1d00', weight: 5, opacity: 0.5, interactive: true },
-                    onEachFeature: function (feature, layer) {
-                        if (feature.properties && Object.keys(feature.properties).length > 0) {
-                            let routeName   = feature.properties.RT_NAME || "Unknown Route";
-                            let routeStatus = feature.properties.RT_STS  || "Unknown Status";
-                            let routeType   = feature.properties.RT_TYPE || "Unknown Route Type";
-                            let routeNum    = feature.properties.RT_NMBR || "Unknown Route Number";
-
-                            let popupContent = "<h3>MyCiTi Bus Route</h3>" +
-                                               "<p><b>Route Name:</b> " + routeName + "</p>" +
-                                               "<p><b>Route Status:</b> " + routeStatus + "</p>" +
-                                               "<p><b>Route Type:</b> " + routeType + "</p>" +
-                                               "<p><b>Route Number:</b> " + routeNum + "</p>";
-
-                            layer.bindPopup(popupContent);
-                        } else {
-                            layer.bindPopup("<b>MyCiTi Route Layer Clicked!</b><br><i>No attributes found.</i>");
-                        }
-                    }
-                }).addTo(map); // FIXED: Brackets realigned cleanly here
-
-                routeLayer.bringToFront();
-            })
-            .catch(error => {
-                console.error('Error loading your route GeoJSON file:', error);
-            });    
-
-        // 6. Fetch MyCiTi Bus Stops Layer
-        fetch('MyCiTi_Bus_Stops.geojson') 
-            .then(response => response.json())
-            .then(geojsonData => {
-                // FIXED: Explicitly defined stopsLayer variable so bringToFront works below
-                let stopsLayer = L.geoJSON(geojsonData, {
-                    pointToLayer: function (feature, latlng) {
-                        return L.circleMarker(latlng, {
-                            radius: 5,         
-                            fillColor: '#ffffff', 
-                            color: '#0052cc',     
-                            weight: 2,
-                            opacity: 1,
-                            fillOpacity: 0.9
-                        });
+                
+                L.geoJSON(geojsonData, {
+                    style: function(feature){ 
+                        var routeIdentifier = String(feature.properties.RT_NMBR || "");
+                        var routeColoursMap = {
+                            '101': '#e31a1c', '102': '#1f78b4', '103': '#ffaa00', '104': '#00e6c3', '105': '#33a02c',
+                            '106': '#b2df8a', '107': '#fb9a99', '108': '#fdbf6f', '109': '#ff7f00', '111': '#cab2d6',
+                            '113': '#6a3d9a', '114': '#b15928', '115': '#a6cee3', '118': '#290629', '213': '#543005',
+                            '214a': '#8c510a', '214b': '#bf812d', '214c': '#dfc27d', '215': '#80cdc1', '216': '#35978f',
+                            '217': '#01665e', '223': '#003c30', '231': '#4d4d4d', '232': '#9e0142', '233': '#d53e4f',
+                            '234': '#f46d43', '235': '#fdae61', '236': '#e6f598', '237': '#abdda4', '244': '#66c2a5',
+                            '245': '#3288bd', '246': '#5e4fa2', '260': '#762a83', '261': '#9970ab', '262': '#c2a5cf',
+                            'A01': '#ff007f', 'D01': '#1a9850', 'D02': '#66bd63', 'D03': '#a6d96a', 'D04': '#fee08b',
+                            'D05': '#fdae61', 'D08': '#f46d43', 'T01': '#053061', 'T01X': '#2166ac', 'T02': '#4393c3',
+                            'T02x': '#92c5de', 'T03': '#b2182b', 'T04': '#67001f'
+                        };
+                        var selectedColour = routeColoursMap[routeIdentifier] || '#E3DB14';
+                        return { color: selectedColour, weight: 3, opacity: 0.6 };
                     },
+                    
                     onEachFeature: function (feature, layer) {
-                        if (feature.properties && Object.keys(feature.properties).length > 0) {
-                            let stopName   = feature.properties.STOP_NAME || "Unknown Stop";
-                            let stopType   = feature.properties.STOP_TYPE || "Unknown Type";
-                            let stopStatus = feature.properties.STOP_STS  || "Unknown Status";
-                            let stopDesc   = feature.properties.STOP_DSCR || "No description available.";
-
-                            let popupContent = "<h3>MyCiTi Bus Stop</h3>" +
-                                               "<p><b>Name:</b> " + stopName + "</p>" +
-                                               "<p><b>Type:</b> " + stopType + "</p>" +
-                                               "<p><b>Status:</b> " + stopStatus + "</p>" +
-                                               "<p><b>Description:</b> " + stopDesc + "</p>";
-
-                            layer.bindPopup(popupContent);
-                        } else {
-                            layer.bindPopup("<b>MyCiTi Bus Stop</b><br><i>No data attributes found.</i>");
-                        }
+                        layer.on('click', function(e) {
+                            L.DomEvent.stopPropagation(e); 
+                            
+                            let routeName   = feature.properties.RT_NAME   || feature.properties.name       || "Unknown Route";
+                            let routeStatus = feature.properties.RT_STS    || feature.properties.status     || "Unknown Status";
+                            let routeType   = feature.properties.RT_TYPE   || feature.properties.type       || "Unknown Route Type";
+                            let routeNum    = feature.properties.RT_NMBR   || feature.properties.ROUTE_NUM  || "Unknown Number";
+                            
+                            updateSidebar(
+                                "Transit Corridor Vector", 
+                                `🚌 Route ${routeNum}`, 
+                                "#eff6ff", "#2563eb", "#1e40af",
+                                {
+                                    "Route Name": routeName,
+                                    "Network Classification": routeType,
+                                    "Operation Status": routeStatus
+                                }
+                            );
+                        });
                     }
-                }).addTo(map);
+                }).addTo(busRoutesLayer);
 
-                stopsLayer.bringToFront();
+                geojsonData.features.forEach((feature, featureIndex) => {
+                    var coordinates = [];
+                    if (feature.geometry.type === "LineString") {
+                        coordinates = feature.geometry.coordinates;
+                    } else if (feature.geometry.type === "MultiLineString") {
+                        coordinates = feature.geometry.coordinates.flat(1);
+                    }
+
+                    if (!coordinates || coordinates.length === 0) return;
+
+                    var routeName = feature.properties.name || feature.properties.RT_NMBR || "Route " + (featureIndex + 1);
+                    var startPoint = coordinates[0];
+                    var startLatLng = [startPoint[1], startPoint[0]];
+
+                    var busMarker = L.marker(startLatLng, { icon: busIcon }).addTo(liveBusesLayer);
+
+                    busMarker.on('click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        updateSidebar(
+                            "Dynamic Telemetry Vector", 
+                            `⚡ Live Fleet Coach (${routeName})`, 
+                            "#f0fdf4", "#16a34a", "#166534",
+                            {
+                                "Current Target Path": routeName,
+                                "Operational Status": "In Transit Loop",
+                                "Tracking Protocol": "Static Node Interpolation Cycle"
+                            }
+                        );
+                    });
+
+                    activeBuses.push({
+                        marker: busMarker,
+                        routeCoords: coordinates,
+                        currentIndex: 0,
+                        isWaiting: 0
+                    });
+                });
+
+                var busStops = { 0: 10 };
+
+                function moveAllBuses() {
+                    activeBuses.forEach((bus) => {
+                        if (bus.isWaiting > 0) {
+                            bus.isWaiting--;
+                            return; 
+                        }
+                        var currentPoint = bus.routeCoords[bus.currentIndex];
+                        var lat = currentPoint[1];
+                        var lng = currentPoint[0];
+
+                        bus.marker.setLatLng([lat, lng]);
+
+                        if (busStops[bus.currentIndex] !== undefined) {
+                            bus.isWaiting = busStops[bus.currentIndex];
+                        }
+                        bus.currentIndex = (bus.currentIndex + 1) % bus.routeCoords.length;
+                    });
+                }
+
+                moveAllBuses();
+                setInterval(moveAllBuses, 1500);
             })
             .catch(error => {
-                console.error('Error loading your stops GeoJSON file:', error);
+                console.error('Error loading your MyCiti GeoJSON file:', error);
+            });  
+
+
+        // --- 6. FETCH & RENDER MYCITI BUS STOPS ---
+        fetch('MyCiTi_Bus_Stops.geojson') 
+        .then(response => response.json())
+        .then(geojsonData => {
+            let stopsLayer = L.geoJSON(geojsonData, {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 6,         
+                        fillColor: '#ffffff', 
+                        color: '#0052cc',     
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    });
+                },
+                
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        
+                        let stopName   = feature.properties.STOP_NAME || "Unknown Stop";
+                        let stopType   = feature.properties.STOP_TYPE || "Unknown Type";
+                        let stopStatus = feature.properties.STOP_STS  || "Unknown Status";
+                        let stopDesc   = feature.properties.STOP_DSCR || "No description available.";
+
+                        updateSidebar(
+                            "Facility Spatial Asset", 
+                            `🚏 Stop: ${stopName}`, 
+                            "#f5f3ff", "#7c3aed", "#5b21b6",
+                            {
+                                "Station Model Class": stopType,
+                                "Network Asset Status": stopStatus,
+                                "Location Description": stopDesc
+                            }
+                        );
+                    });
+                }
             });
+
+            stopsLayer.addTo(busStopsToggleLayer);
+            stopsLayer.bringToFront();
+        })
+        .catch(error => {
+            console.error('Error loading your stops GeoJSON file:', error);
+        });
+
+        /*
+            Taxi
+        */
+        fetch('Taxi_Routes.geojson')
+        .then(response => response.json())
+        .then(geojsonData => {
+            let taxiLayer = L.geoJSON(geojsonData, {
+                style: {
+                    color: '#000000', 
+                    weight: 3,
+                    opacity: 0.7
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        
+                        // Customize these property names based on your GeoJSON attributes
+                        let origin = feature.properties.ORGN || "Unnamed Origin";
+                        let destination  = feature.properties.DSTN || "Unknown Destination";
+
+                        updateSidebar(
+                            "Taxi Route", 
+                            "#fff1f2", "#e11d48", "#9f1239",
+                            {
+                                "Origin": origin,
+                                "Destination": destination,
+                            }
+                        );
+                    });
+                }
+            });
+
+            // Add to the dedicated layer group
+            taxiLayer.addTo(taxiRouteLayer);
+        })
+        .catch(error => {
+            console.error('Error loading Taxi_Routes.geojson:', error);
+        });
+
     </script>
 </body>
 </html>
